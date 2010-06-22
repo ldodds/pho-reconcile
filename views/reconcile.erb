@@ -1,0 +1,53 @@
+<html>
+	<head>
+	<script type="text/javascript" src="/jquery-1.4.2.min.js"></script>
+	<script text="text/javascript" src="/json2.js"></script>
+	<script type="text/javascript" src="/reconcile.js"></script>	
+	</head>
+	<title><%= params[:store] %> Store Reconciliation API</title>
+
+	<body>
+
+		<h1><%= params[:store] %> Store Reconciliation API</h1>
+		
+		<p>
+		This is a demo implementation of a reconciliation API for the <%= params[:store] %>. The API is intended to 
+		be used from the <a href="http://code.google.com/p/freebase-gridworks">Gridworks</a> application, allowing data loaded into the application to be linked to 
+		resources in this store. 
+		</p>
+		
+		<p>
+		Note that this is a alpha quality API and is provided for exploration and feedback purposes. Discussion of the 
+		general shape of the API should happen on the <a href="http://groups.google.com/group/freebase-gridworks/">gridworks list</a>. 
+		Feedback on this particular implementation should be sent to myself.
+		</p>
+		
+		<h2>API Console</h2>
+		
+		<p>Fill in a query below, to simulate a data item look-up</p>
+		
+		<form id="api-test" action="">
+		<table>
+		<tr>
+			<td><label for="query">Query</label></td>
+			<td><input type="text" id="query" name="query" value="Bath"></td>
+		</tr>
+		<tr>
+			<td><label for="limit">Limit</label></td>
+			<td><input type="text" id="limit" name="limit" value="5"></td>
+		</tr>
+		<tr>
+			<td><label for="type">Type (URI)</label></td>
+			<td><input type="text" id="type" name="type" value=""></td>		
+		</tr>
+			
+		</table>
+		<br />
+		<input type="submit" id="submit" name="submit">
+		 
+		</form>
+	
+	
+	<body>
+
+</html>

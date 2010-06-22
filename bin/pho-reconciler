@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
+
+require 'rubygems'
+require 'reconcile-app'
+
+ReconcileApp.run! :host => 'localhost', :port => 9090
