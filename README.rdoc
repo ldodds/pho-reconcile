@@ -11,9 +11,15 @@ Checkout the code then do:
 
 You can then visit http://localhost:9090/storename/reconcile to see a form. E.g. http://localhost:9090/govuk-statistics/reconcile
 
-Any Talis Platform store can be used. By default searchings use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory.
+Any Talis Platform store can be used. By default searchings use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory. The store must also have the RDF type predicate mapped to a field called "type".
 
-== Notes
+== Implementation
+
+The API is essentially a proxy for the Talis Platform search interface. The API query is turned into a search request using a specific label field and optionally sub-setting on type.
+
+This produces a paged, relevance ranked set of results, that is then processed to produce the JSON output.
+
+== API Notes
  
 ?query={ ...json object literal... }
 
