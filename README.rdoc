@@ -3,56 +3,30 @@
 An experiment to create a Reconciliation API, suitable for integration with the Freebase Gridworks application, 
 that accesses Talis Platform stores.
 
+The API specification is given here:
+
+http://code.google.com/p/freebase-gridworks/wiki/ReconciliationServiceApi
+
 == Running
 
 Checkout the code then do:
 
  ruby bin/pho-reconciler
 
-You can then visit http://localhost:9090/storename/reconcile to see a form. E.g. http://localhost:9090/govuk-statistics/reconcile
+You can then visit http://localhost:9090 to see a test form. 
 
-Any Talis Platform store can be used. By default searchings use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory. The store must also have the RDF type predicate mapped to a field called "type".
+The individual store APIs are at, e.g:
+
+E.g. http://localhost:9090/govuk-statistics/reconcile
+
+Any Talis Platform store name can be used in the URL
+
+By default searches use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory. 
+
+The store must also have the RDF type predicate mapped to a field called "type".
 
 == Implementation
 
 The API is essentially a proxy for the Talis Platform search interface. The API query is turned into a search request using a specific label field and optionally sub-setting on type.
 
 This produces a paged, relevance ranked set of results, that is then processed to produce the JSON output.
-
-== API Notes
- 
-?query={ ...json object literal... }
-
-?queries= { ... json object literal... }
-
-{
- #search query
- query: "query",
- 
- limit: "limit",
-  
- type: "type" OR "array of types",
- type_strict: any, all, ...
- 
- #properties are additional restrictions
- properties: {
-    key: value
-    OR
-    key: {
-    	id : ""
-    }  
- }
- 
-}
-
-Multiple queries are hashed under arbitrary keys.
-
-Response:
-
-{
-  id: "",
-  score: "",
-  types: [],
-  properties: []
-}
-

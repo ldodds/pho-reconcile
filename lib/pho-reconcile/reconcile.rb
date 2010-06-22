@@ -70,6 +70,7 @@ module PhoReconcile
         if (type_strict != :all || type_strict != :any)
           type_strict = :any
         end
+        #TODO implement :should = as with any, but gets a boost on score if matches
       end
       
       if obj["properties"] != nil
@@ -135,11 +136,23 @@ module PhoReconcile
       end
       doc = REXML::Document.new(resp.content)
       results = Array.new
+      
+      #TODO
+      #
+      # Score boosting:
+      #  for :should we need to boost score if type matches
+      #
+      # Property filtering:
+      #  if properties are specified, we need to filter the results
+      #  based on the property.
+      #  URI based properties need to be filtered locally
+      #  Literal properties *could be filtered in search*
+      #
+      #  Local filtering may effect number of results. Optionally re-search?
+      #      
       REXML::XPath.each(doc.root, "//rss:item", PhoReconcile::NAMESPACES) do |el|
         id = el.attributes["rdf:about"]
           
-        #TODO if rdfs:label not in fpmap, then we'll have a default title here
-        #which isn't what we want. Allow override
         label = REXML::XPath.first(el, "rss:title", PhoReconcile::NAMESPACES ).text
         score = REXML::XPath.first(el, "relevance:score", PhoReconcile::NAMESPACES ).text
         match = match?(score)
@@ -155,6 +168,7 @@ module PhoReconcile
               if full_name == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
                    desc = REXML::XPath.first(child, "rdf:Description", PhoReconcile::NAMESPACES)
                    types << desc.attributes["rdf:about"]
+              #this allows override of how name is generated. Default is from rss:title
               elsif @opts[:label_property] != nil && full_name == @opts[:label_property]
                   label = child.text
               else

@@ -26,15 +26,26 @@ class ReconcileApp < Sinatra::Base
     return opts
   end
   
+  get "/" do
+    @stores = Array.new
+    Dir.glob("#{settings.config}/*.json").each do |file|
+      storename = File.basename(file).gsub(".json", "")
+      @stores << storename
+    end
+    erb :index
+  end
+  
   get "/:store/reconcile" do
-    store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
-    
+    @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
+    @opts = read_opts(params[:store])
+      
     query = params[:query]
     if query == nil
-      erb :reconcile
+      content_type "application/json"      
+      erb :service
     else
       parsed = JSON.parse(query)
-      reconciler = PhoReconcile::Reconciler.new(store, read_opts(params[:store]) )
+      reconciler = PhoReconcile::Reconciler.new( @store, @opts )
         
       results = reconciler.reconcile_request(parsed)
       #resp = HTTP::Message.new_response(RESPONSE)      
