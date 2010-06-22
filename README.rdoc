@@ -3,11 +3,17 @@
 An experiment to create a Reconciliation API, suitable for integration with the Freebase Gridworks application, 
 that accesses Talis Platform stores.
 
-Assumptions.
+== Running
 
-Store must have following fpmap and query profile entries:
- label => rdfs:label
- type => rdf:type
+Checkout the code then do:
+
+ ruby bin/pho-reconciler
+
+You can then visit http://localhost:9090/storename/reconcile to see a form. E.g. http://localhost:9090/govuk-statistics/reconcile
+
+Any Talis Platform store can be used. By default searchings use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory.
+
+== Notes
  
 ?query={ ...json object literal... }
 
