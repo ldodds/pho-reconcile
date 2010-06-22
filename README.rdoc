@@ -19,8 +19,8 @@ Store must have following fpmap and query profile entries:
  
  limit: "limit",
   
- types: "type" OR "array of types",
- types_strict: any, all, ...
+ type: "type" OR "array of types",
+ type_strict: any, all, ...
  
  #properties are additional restrictions
  properties: {
