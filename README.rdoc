@@ -1,0 +1,46 @@
+= PHO-RECONCILE
+
+An experiment to create a Reconciliation API, suitable for integration with the Freebase Gridworks application, 
+that accesses Talis Platform stores.
+
+Assumptions.
+
+Store must have following fpmap and query profile entries:
+ label => rdfs:label
+ type => rdf:type
+ 
+?query={ ...json object literal... }
+
+?queries= { ... json object literal... }
+
+{
+ #search query
+ query: "query",
+ 
+ limit: "limit",
+  
+ types: "type" OR "array of types",
+ types_strict: any, all, ...
+ 
+ #properties are additional restrictions
+ properties: {
+    key: value
+    OR
+    key: {
+    	id : ""
+    }  
+ }
+ 
+}
+
+Multiple queries are hashed under arbitrary keys.
+
+Response:
+
+{
+  id: "",
+  score: "",
+  types: [],
+  properties: []
+}
+
