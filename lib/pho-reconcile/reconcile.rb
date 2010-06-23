@@ -26,8 +26,7 @@ module PhoReconcile
         "name" => @label,
         "score" => @score,
         "match" => @match,
-        "type" => types,
-        "properties" => properties
+        "type" => types
       }.to_json(*a)
     end
   end
@@ -115,14 +114,12 @@ module PhoReconcile
            end
          end
       end
-      
-      puts search
-      
+            
       #Note: this assumes labels in fpmap. Could also pass as URIs
       #FIXME: doesn't support nested ids -- handle as SPARQL?
-      if !properties.empty?
-        search = search + " " + properties.to_a.map { |entry| "#{entry[0]}:#{entry[1]}" }.join(" ")        
-      end
+      #if !properties.empty?
+      #  search = search + " " + properties.to_a.map { |entry| "#{entry[0]}:#{entry[1]}" }.join(" ")        
+      #end
         
       resp = @store.search(search, opts)
             
