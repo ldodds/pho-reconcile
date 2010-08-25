@@ -44,7 +44,7 @@ class ReconcileApp < Sinatra::Base
               
     if params[:query] == nil && params[:queries] == nil
       content_type "application/json"      
-      erb :service
+      return erb :service
     elsif params[:query] != nil
       query = params[:query]      
       begin   
