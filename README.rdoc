@@ -96,10 +96,6 @@ and "schemaSpace" properties to the relevant JSON configuration.
 
 == TODO
 
-Features
-
-* Multiple query support
-
 Deployment
 
 * Can we process the field-predicate map to do sensible field defaulting?

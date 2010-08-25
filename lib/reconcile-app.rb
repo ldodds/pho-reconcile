@@ -41,45 +41,59 @@ class ReconcileApp < Sinatra::Base
     else
       @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
     end
-          
-    #TODO multiple queries  
-    query = params[:query]
-    if query == nil
+              
+    if params[:query] == nil && params[:queries] == nil
       content_type "application/json"      
       erb :service
-    else
-      if !query.start_with?("{")
-        parsed = { "query" => query }
-      else
-        parsed = JSON.parse(query)  
-      end
-      
-      reconciler = PhoReconcile::Reconciler.new( @store, @opts )
-      
+    elsif params[:query] != nil
+      query = params[:query]      
       begin   
+        
+        if !query.start_with?("{")
+          parsed = { "query" => query }
+        else
+          parsed = JSON.parse(query)  
+        end
+        
+        reconciler = PhoReconcile::Reconciler.new( @store, @opts )        
         results = reconciler.reconcile_request(parsed)
         #resp = HTTP::Message.new_response(RESPONSE)      
-        #results = reconciler.parse_response( resp )
-  
+        #results = reconciler.parse_response( resp )  
         response = "{ \"result\": " + results.to_json()  + " }"
               
-        if params[:callback] != nil
-          content_type "application/javascript"
-          return "#{params[:callback]}(response);"
-        else
-          content_type "application/json"
-          return response          
-        end
       rescue
         #TODO specification doesn't talk about structure of error responses
         status 500
         return "Unable to perform reconcilation request"
       end
-      
-    end
     
+    else
+      #multiple queries
+      reconciler = PhoReconcile::Reconciler.new( @store, @opts )   
+      begin
+        queries = JSON.parse( params[:queries] )          
+        response = {}
+        queries.keys.each do |key|
+          response[key] = reconciler.reconcile_request( queries[key] ) 
+        end
+        response = response.to_json
+       rescue
+         status 500
+         return "Unable to perform reconciliation requests"
+       end
+    end
+
+    if params[:callback] != nil
+      content_type "application/javascript"
+      return "#{params[:callback]}(response);"
+    else
+      content_type "application/json"
+      return response          
+    end
+        
   end
   
+  #This is just here for when I'm testing the app on the train...
   RESPONSE = <<-EOL 
   <rdf:RDF xmlns="http://purl.org/rss/1.0/"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
