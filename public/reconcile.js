@@ -6,7 +6,7 @@ $(document).ready(function(){
 	  "limit": $("#limit").val(),
 	  "type": $("#type").val()
 	};
-	window.location = "/" + $("#store").val() + "/reconcile?query=" + escape( JSON.stringify(query) );
+	window.location = "" + $("#store").val() + "/reconcile?query=" + escape( JSON.stringify(query) );
 	return false;
   });
   
