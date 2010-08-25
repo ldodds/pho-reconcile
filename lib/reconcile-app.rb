@@ -57,9 +57,9 @@ class ReconcileApp < Sinatra::Base
       reconciler = PhoReconcile::Reconciler.new( @store, @opts )
       
       begin   
-        #results = reconciler.reconcile_request(parsed)
-        resp = HTTP::Message.new_response(RESPONSE)      
-        results = reconciler.parse_response( resp )
+        results = reconciler.reconcile_request(parsed)
+        #resp = HTTP::Message.new_response(RESPONSE)      
+        #results = reconciler.parse_response( resp )
   
         response = "{ \"result\": " + results.to_json()  + " }"
               
