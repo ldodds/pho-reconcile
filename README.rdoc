@@ -1,7 +1,7 @@
 = PHO-RECONCILE
 
-An experiment to create a Reconciliation API, suitable for integration with the Freebase Gridworks application, 
-that accesses Talis Platform stores.
+An experiment to create a Reconciliation API, suitable for integration with the Freebase 
+Gridworks application, that accesses Talis Platform stores.
 
 The API specification is given here:
 
@@ -19,14 +19,92 @@ The individual store APIs are at, e.g:
 
 E.g. http://localhost:9090/govuk-statistics/reconcile
 
-Any Talis Platform store name can be used in the URL
+Any Talis Platform store name can be used in the URL. Some settings may need to be 
+tweaked on a per-store basis. This is handled by creating a JSON configuration file 
+for the store in the config directory.
 
-By default searches use the "label" field, but this can be tweaked on a per store basis. See JSON examples in the config directory. 
+== API Configuration
 
-The store must also have the RDF type predicate mapped to a field called "type".
+The API is essentially a proxy for the search interface that is maintained for the 
+Platform store. Search requests are made using fielded searches. The names of these 
+fields can be tweaked on a per-store basis.
 
-== Implementation
+The text to reconcile is assumed to be a label for the resource. By default a search 
+is made using a field called "label". This can be altered by changing the "search_field" 
+property in the JSON configuration.
 
-The API is essentially a proxy for the Talis Platform search interface. The API query is turned into a search request using a specific label field and optionally sub-setting on type.
+The results from the search include all properties of the resource. One of those properties 
+must be identified as the label for the resource. By default the rdfs:label property is used. 
+However this too can be altered in the JSON configuration.
 
-This produces a paged, relevance ranked set of results, that is then processed to produce the JSON output.
+The govuk-statistics store configuration changes both of these properties:
+
+ {
+   "search_field": "prefLabel",
+   "label_property": "http://www.w3.org/2004/02/skos/core#prefLabel"
+ }
+
+Finally, for a reconcilation result to be considered an exact match the search on the 
+store must return a relevance score of 1.0. However this too can be changed by tweaking 
+the configuration, so if we want to allow a score of 0.8 or higher to be considered to 
+be a match, we can tweak the above configuration to:
+
+ {
+   "search_field": "prefLabel",
+   "label_property": "http://www.w3.org/2004/02/skos/core#prefLabel",
+   "match_score": 0.8
+ }
+
+== Store Configuration
+
+In order to allow filtering of results based on type, the Platform Store search index 
+must be configured to include the rdf:type predicate in the field-predicate map. The 
+predicate must be mapped to a field called "type".
+
+== Implementation Notes
+
+As noted above the API is just a proxy for the Talis Platform search interface. Reconciliation 
+requests are translated into a fielded search against the search index for the relevant 
+store, e.g.:
+
+ /[store]/items?label:[text]&type:"...uri..."
+
+The results of a search is an RSS 1.0 feed that provides a paged, relevance ranked set of 
+results. Each feed item is a resource in the store, and a full description of the resource 
+is provided.
+
+The feed is then processed to produce the response to the reconciliation request.
+
+There are a few places where the Reconcilation API design has an uneasy fit with RDF.
+
+Firstly, the API allows identifiers for resources, types and properties to be arbitrary strings, which 
+are then handled in whatever way an implementation chooses. For an RDF service is makes sense 
+to use URIs through-out here. 
+
+However the API allows filtering of properties based on either a name or identifier for the property (pid). Only property identifiers are supported. I've 
+assumed that the Gridworks client will ultimately allow some mapping of column names here. An 
+alternate approach is to use a field-predicate mapping similar to how Platform Stores currently 
+map identifier URIs to short labels for indexing purposes. 
+
+The first one is the notion of an "identifier space" and a "schema space". These respectively 
+map to a scope for the identifiers and properties returned by a service implementation. A 
+triple store doesn't really have the same concept of scoping as Freebase, but we could consider 
+either a specific graph, or the whole store as the scope. This implementation takes the latter 
+approach and so by default uses the URI of the store as the identifiers for these "spaces". 
+If this is not correct then it can be altered on a per store basis by adding "identifierSpace" 
+and "schemaSpace" properties to the relevant JSON configuration.
+
+== TODO
+
+Features
+
+* Multiple query support
+
+Deployment
+
+* Can we process the field-predicate map to do sensible field defaulting?
+  
+Service Metadata
+
+* Can we do something to support the suggest widget configuration?
+* What is the default types array?

@@ -1,4 +1,16 @@
 {
-	"name" : "<%= params[:store] %> Store Reconciliation Service",
-    "identity-space" : "<%= @store.storeuri() %>"
+	"name" : "<%= params[:store] %> Reconciliation Service",
+	<% if @opts[:identifierSpace] != nil %>
+    "identifierSpace" : "<%= @opts[:identifierSpace] %>",	
+	<% else %>
+    "identifierSpace" : "<%= @store.storeuri() %>",	
+	<% end %>
+	<% if @opts[:schemaSpace] != nil %>
+    "schemaSpace" : "<%= @opts[:schemaSpace] %>",	
+	<% else %>
+    "schemaSpace" : "<%= @store.storeuri() %>",	
+	<% end %>
+	"view" : {
+	    "url" : "{{id}}"
+	 }    
 }

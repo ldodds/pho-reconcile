@@ -22,7 +22,6 @@ class ReconcileApp < Sinatra::Base
         opts[k.to_sym] = v
       end
     end
-    puts opts
     return opts
   end
   
@@ -36,30 +35,47 @@ class ReconcileApp < Sinatra::Base
   end
   
   get "/:store/reconcile" do
-    @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
     @opts = read_opts(params[:store])
-      
+    if @opts != nil && @opts[:store] != nil
+      @store = Pho::Store.new("http://api.talis.com/stores/#{@opts[:store]}")
+    else
+      @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
+    end
+          
+    #TODO multiple queries  
     query = params[:query]
     if query == nil
       content_type "application/json"      
       erb :service
     else
-      parsed = JSON.parse(query)
-      reconciler = PhoReconcile::Reconciler.new( @store, @opts )
-        
-      results = reconciler.reconcile_request(parsed)
-      #resp = HTTP::Message.new_response(RESPONSE)      
-      #results = reconciler.parse_response( resp )
-
-      response = "{ \"result\": " + results.to_json()  + " }"
-            
-      if params[:callback] != nil
-        content_type "application/javascript"
-        return "#{params[:callback]}(response);"
+      if !query.start_with?("{")
+        parsed = { "query" => query }
       else
-        content_type "application/json"
-        return response          
+        parsed = JSON.parse(query)  
       end
+      
+      reconciler = PhoReconcile::Reconciler.new( @store, @opts )
+      
+      begin   
+        #results = reconciler.reconcile_request(parsed)
+        resp = HTTP::Message.new_response(RESPONSE)      
+        results = reconciler.parse_response( resp )
+  
+        response = "{ \"result\": " + results.to_json()  + " }"
+              
+        if params[:callback] != nil
+          content_type "application/javascript"
+          return "#{params[:callback]}(response);"
+        else
+          content_type "application/json"
+          return response          
+        end
+      rescue
+        #TODO specification doesn't talk about structure of error responses
+        status 500
+        return "Unable to perform reconcilation request"
+      end
+      
     end
     
   end

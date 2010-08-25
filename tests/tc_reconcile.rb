@@ -1,5 +1,6 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'rubygems'
+
 require 'test/unit'
 require 'pho'
 require 'pho-reconcile'
@@ -16,11 +17,11 @@ class ReconcileTest < Test::Unit::TestCase
   TYPED_REQUEST = <<-EOL
   {
     "query": "Bath",
-    "types": [
+    "type": [
         "http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2",
         "http://www.example.org/ns/Place"
     ],
-    "types_strict": "any"    
+    "type_strict": "any"    
   }
   EOL
         
@@ -116,7 +117,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:<http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2>", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "limit" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -132,7 +133,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_any_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:<http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2> OR type:<http://www.example.org/ns/Place>)", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -148,7 +149,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_all_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:<http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2> AND type:<http://www.example.org/ns/Place>)", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" AND type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -164,7 +165,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_type_and_properties()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:<http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2> notation:UKK2", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "limit" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -174,9 +175,10 @@ class ReconcileTest < Test::Unit::TestCase
     types = []
     types << "http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2"    
     
-    properties = {
-      "notation" => "UKK2"
-    }
+    properties = [ {
+       "pid" => "http://www.w3.org/2004/02/skos/core#notation", 
+       "v" => "UKK2"
+    } ]
     
     resp = reconciler.reconcile("Bath", 10, types, :any, properties)
             
@@ -209,11 +211,12 @@ class ReconcileTest < Test::Unit::TestCase
   def test_parse_typed_query_from_json()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:<http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2> OR type:<http://www.example.org/ns/Place>)", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)    
     reconciler = PhoReconcile::Reconciler.new(store)    
+
     resp = reconciler.reconcile_request( JSON.parse( TYPED_REQUEST ) )            
   end  
 end

@@ -1,0 +1,5 @@
+{
+ "store": "govuk-statistics",
+ "search_field": "prefLabel",
+ "label_property": "http://www.w3.org/2004/02/skos/core#prefLabel"
+}

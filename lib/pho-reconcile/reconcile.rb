@@ -29,6 +29,52 @@ module PhoReconcile
         "type" => types
       }.to_json(*a)
     end
+
+    #Implements filtering based on properties specified in the reconciliation
+    #request. The filters parameter is an array of hashes of the form:
+    #
+    #  {
+    #   "p" : string, property name, e.g., "country", or
+    #   "pid" : string, property ID, e.g., "/people/person/nationality" in the Freebase ID space
+    #   "v" : a single, or an array of, string or number or object literal, e.g., "Japan"
+    #  }
+    #
+    # Only a pid values are supported in this implementation     
+    def matches?(filters)
+      
+      return true if filters.length == 0
+        
+      filters.each do |filter|        
+        pid = filter["pid"]
+        if @properties[ pid ] != nil        
+          v = filter["v"]
+          if v.class == "Array"
+            v.each do |value|
+              #TODO for multiple values do they all match?
+              value = v["id"] if v.class == "Object"
+              value = v.to_s if v.class != "Object"
+              return false if !match_property?(pid, value)              
+            end
+          else
+            value = v["id"] if v.class == "Object"
+            value = v.to_s if v.class != "Object"
+            return false if !match_property?(pid, value)
+          end
+        else
+          return false
+        end
+        
+      end
+      
+      return true
+            
+    end
+    
+    def match_property?(pid, value)
+      return true if @properties[pid].to_s == value
+      return false
+    end
+    
   end
   
   #Performs reconciliation tasks against the search index of a Talis Platfom store
@@ -41,7 +87,7 @@ module PhoReconcile
       @opts = opts
     end
     
-    #perform reconcilation as described in the provided json
+    #Perform a reconcilation request as described in the provided json object
     def reconcile_request(obj)
       query = obj["query"]
       limit = 10
@@ -50,15 +96,13 @@ module PhoReconcile
 
       if obj["limit"] != nil
         limit = obj["limit"].to_i
-      end      
-      
-      properties = Hash.new
+      end
       
       if obj["type"] != nil
         if obj["type"].class == "String"
           types << obj["type"]
         else
-          obj["type"].each do |type|
+          obj["type"].each do |type|        
             types << type
           end
         end
@@ -66,12 +110,13 @@ module PhoReconcile
       
       if obj["type_strict"] != nil
         type_strict = obj["type_strict"].to_sym
-        if (type_strict != :all || type_strict != :any)
+        #treat unrecognised values as :any  
+        if (type_strict != :all || type_strict != :any || type_strict != :should)
           type_strict = :any
         end
-        #TODO implement :should = as with any, but gets a boost on score if matches
       end
       
+      properties = Array.new
       if obj["properties"] != nil
         properties = properties
       end
@@ -91,7 +136,7 @@ module PhoReconcile
     #perform reconciliation
     #
     #  type_strict:: :any, :all, ...
-    def reconcile(query, limit=10, types=[], type_strict=:any, properties={})
+    def reconcile(query, limit=10, types=[], type_strict=:any, properties=[])
       #TODO make this configurable so we can search several different fields?      
       search = "#{search_field()}:#{query}"
       opts = {
@@ -99,7 +144,8 @@ module PhoReconcile
       }
       
       if types.length > 0
-        if type_strict == :any
+        #treat :should like :any
+        if type_strict == :any || type_strict == :should           
            if types.length == 1
              search = search + " #{type_field()}:\"#{types[0]}\""
            else
@@ -115,19 +161,13 @@ module PhoReconcile
          end
       end
             
-      #Note: this assumes labels in fpmap. Could also pass as URIs
-      #FIXME: doesn't support nested ids -- handle as SPARQL?
-      #if !properties.empty?
-      #  search = search + " " + properties.to_a.map { |entry| "#{entry[0]}:#{entry[1]}" }.join(" ")        
-      #end
-        
       resp = @store.search(search, opts)
             
-      return parse_response(resp)
+      return parse_response(resp, properties)
     end
     
     #parse a platform search response into an array of Response objects
-    def parse_response(resp)
+    def parse_response(resp, filters=[])
       if resp.status != 200
         raise "Unable to read search response: #{resp.status} #{resp.content}"
       end
@@ -158,6 +198,7 @@ module PhoReconcile
         types = Array.new
         properties = Hash.new
                 
+        #TODO handle multi-valued properties
         el.elements.each do |child|
           if child.prefix != NAMESPACES["rss"]
             if child.prefix != nil && child.prefix != ""
@@ -168,19 +209,31 @@ module PhoReconcile
               #this allows override of how name is generated. Default is from rss:title
               elsif @opts[:label_property] != nil && full_name == @opts[:label_property]
                   label = child.text
+                  properties[full_name] = child.text
               else
-                  #TODO other properties                       
+                  #resource?
+                  desc = REXML::XPath.first(child, "rdf:Description", PhoReconcile::NAMESPACES)
+                  if desc != nil
+                    properties[full_name] = desc.attributes["rdf:about"]
+                  else
+                    properties[full_name] = child.text
+                  end       
               end
             end
           end
         end
+
+        result = Result.new( id, label, score, match, types, properties )
         
-        results << Result.new( id, label, score, match, types, properties )
+        if result.matches?(filters)
+          results << result 
+        end
+        
       end
 
       return results
     end
-    
+        
     #Does this score count as a match?
     def match?(score)
       if @opts[:match_score] != nil
