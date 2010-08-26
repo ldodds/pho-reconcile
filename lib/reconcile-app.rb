@@ -33,7 +33,39 @@ class ReconcileApp < Sinatra::Base
     end
     erb :index
   end
-  
+
+  post "/:store/reconcile" do
+    @opts = read_opts(params[:store])
+    if @opts != nil && @opts[:store] != nil
+      @store = Pho::Store.new("http://api.talis.com/stores/#{@opts[:store]}")
+    else
+      @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
+    end
+
+    #multiple queries
+    reconciler = PhoReconcile::Reconciler.new( @store, @opts )   
+    begin
+      queries = JSON.parse( params[:queries] )          
+      response = {}
+      queries.keys.each do |key|
+      response[key] = { "result" => reconciler.reconcile_request( queries[key] ) } 
+      end
+      response = response.to_json
+     rescue
+       status 500
+       return "Unable to perform reconciliation requests"
+     end
+
+    if params[:callback] != nil
+      content_type "application/javascript"
+      return "#{params[:callback]}(response);"
+    else
+      content_type "application/json"
+      return response          
+    end
+         
+  end
+    
   get "/:store/reconcile" do
     @opts = read_opts(params[:store])
     if @opts != nil && @opts[:store] != nil
@@ -43,8 +75,15 @@ class ReconcileApp < Sinatra::Base
     end
               
     if params[:query] == nil && params[:queries] == nil
-      content_type "application/json"      
-      return erb :service
+      if params[:callback] != nil
+        content_type "application/javascript"
+        response = erb :service
+        return "#{params[:callback]}(#{response});"
+      else
+        content_type "application/json"      
+        return erb :service          
+      end
+      
     elsif params[:query] != nil
       query = params[:query]      
       begin   
@@ -74,7 +113,7 @@ class ReconcileApp < Sinatra::Base
         queries = JSON.parse( params[:queries] )          
         response = {}
         queries.keys.each do |key|
-          response[key] = reconciler.reconcile_request( queries[key] ) 
+          response[key] = { "result" => reconciler.reconcile_request( queries[key] ) } 
         end
         response = response.to_json
        rescue
