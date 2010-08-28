@@ -40,6 +40,7 @@ SPEC =
     s.add_dependency("siren")
     s.add_dependency("rest-client")
     s.add_dependency("rspec")
+    s.add_dependency("json")
 
   end
       
