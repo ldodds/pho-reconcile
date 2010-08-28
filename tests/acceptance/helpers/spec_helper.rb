@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'spec'
 require 'rest_client'
+require 'siren'
+require 'json'
 
 def server()
   return ENV["RECONCILE_BASE"] || "localhost:9090"
