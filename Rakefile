@@ -23,13 +23,20 @@ SPEC =
     s.author = "Leigh Dodds"
     s.email = 'leigh.dodds@talis.com'
     s.homepage = 'http://github.com/ldodds/gridworks-reconcile'
-    #s.rubyforge_project = 'pho'
     s.files = PKG_FILES
     s.require_path = "lib" 
     s.bindir = "bin"
+    
+    #For core implementation
     s.executables = ["pho-reconciler"]
     s.add_dependency("pho", ">= 0.7.3")
     s.add_dependency("sinatra", ">= 1.0")
+
+    #For acceptance tests
+    s.add_dependency("siren")
+    s.add_dependency("rest-client")
+    s.add_dependency("rspec")
+
   end
       
 Rake::GemPackageTask.new(SPEC) do |pkg|
@@ -45,6 +52,10 @@ end
 desc "Uninstall the gem"
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
+end
+
+task :acceptance do
+  sh %{spec tests/acceptance/suite.spec}  
 end
 
 Rake::TestTask.new do |test|
