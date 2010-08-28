@@ -5,7 +5,7 @@ require 'rake/testtask'
 require 'rake/clean'
 
 NAME = "pho-reconcile"
-VER = "0.0.1"
+VER = "0.0.2"
 PKG_FILES = %w( README.rdoc Rakefile ) + 
   Dir.glob("{bin,lib,public,views}/**/*")
 
@@ -19,7 +19,7 @@ SPEC =
     s.has_rdoc = true
     s.extra_rdoc_files = ["README.rdoc"]
     s.summary = "Reconciliation API for Talis Platform Stores"
-    s.description = s.summary
+    s.description = "Implementation of the Gridworks Reconciliation API"
     s.author = "Leigh Dodds"
     s.email = 'leigh.dodds@talis.com'
     s.homepage = 'http://github.com/ldodds/gridworks-reconcile'
@@ -27,7 +27,7 @@ SPEC =
     s.files = PKG_FILES
     s.require_path = "lib" 
     s.bindir = "bin"
-#    s.executables = ["utensil"]
+    s.executables = ["pho-reconciler"]
     s.add_dependency("pho", ">= 0.7.3")
     s.add_dependency("sinatra", ">= 1.0")
   end
@@ -48,5 +48,5 @@ task :uninstall => [:clean] do
 end
 
 Rake::TestTask.new do |test|
-  test.test_files = FileList['tests/tc_*.rb']
+  test.test_files = FileList['tests/unit/tc_*.rb']
 end
