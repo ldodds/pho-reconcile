@@ -1,13 +1,17 @@
 require 'rake'
+
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/testtask'
 require 'rake/clean'
+require 'pho'
 
 NAME = "pho-reconcile"
 VER = "0.0.2"
 PKG_FILES = %w( README.rdoc Rakefile ) + 
   Dir.glob("{bin,lib,public,views}/**/*")
+
+RECONCILE_TEST_STORE="http://api.talis.com/stores/ldodds-pho-reconcile"
 
 CLEAN.include ['*.gem', 'pkg']  
 SPEC =
@@ -54,6 +58,31 @@ task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
 
+desc "Prepare store configuration for testing"
+task :prepare_store do
+  storename = ENV[RECONCILE_TEST_STORE] || RECONCILE_TEST_STORE
+  puts "Preparing Field-Predicate Map for #{storename}"
+  store = Pho::Store.new(storename, ENV["TALIS_USER"], ENV["TALIS_PASS"])
+  fpmap = Pho::FieldPredicateMap.read_from_store(store)
+  fpmap.datatype_properties.each do |prop|
+    fpmap.remove_by_name( prop.name )
+  end
+  fpmap << Pho::FieldPredicateMap.create_mapping(store, "http://www.w3.org/2000/01/rdf-schema#label", "label")
+  fpmap << Pho::FieldPredicateMap.create_mapping(store, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "type")
+  fpmap << Pho::FieldPredicateMap.create_mapping(store, "http://xmlns.com/foaf/0.1/name", "name")
+  fpmap.upload(store)
+end
+  
+desc "Load test data into the acceptance test store. Set TALIS_USER and TALIS_PASS env variables"
+task :load_test_data do
+  storename = ENV[RECONCILE_TEST_STORE] || RECONCILE_TEST_STORE  
+  sh %{talis_store store -s #{storename} -f tests/acceptance/test-data.ttl}  
+end
+
+desc "Prepare acceptance test store"
+task :prepare_acceptance => [:prepare_store, :load_test_data]
+  
+desc "Run acceptance test suite"
 task :acceptance do
   sh %{spec tests/acceptance/suite.spec}  
 end

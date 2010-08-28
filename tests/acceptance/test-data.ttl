@@ -1,0 +1,29 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ex: <http://www.example.org/def/> .
+
+<http://www.example.org/person/1>
+  a foaf:Person;
+  foaf:name "Joe Bloggs".
+  
+<http://www.example.org/person/2>
+  a foaf:Person;
+  foaf:name "Bernard Crumble".  
+  
+<http://www.example.org/person/2>
+  a foaf:Person;
+  foaf:name "Joe Smith".
+  
+<http://www.example.org/thing/a>
+  a ex:Object;
+  rdfs:label "Whale".      
+  
+<http://www.example.org/thing/b>
+  a ex:Object;
+  rdfs:label "Petunias".        
+  
+<http://www.example.org/thing/c>
+  a ex:Object;
+  rdfs:label "Green Putty".          
