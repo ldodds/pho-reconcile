@@ -6,15 +6,15 @@
 
 <http://www.example.org/person/1>
   a foaf:Person;
-  foaf:name "Joe Bloggs".
+  rdfs:label "Joe Bloggs".
   
 <http://www.example.org/person/2>
   a foaf:Person;
-  foaf:name "Bernard Crumble".  
+  rdfs:label "Bernard Crumble".  
   
 <http://www.example.org/person/2>
   a foaf:Person;
-  foaf:name "Joe Smith".
+  rdfs:label "Joe Smith".
   
 <http://www.example.org/thing/a>
   a ex:Object;
