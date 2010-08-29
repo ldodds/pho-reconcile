@@ -140,7 +140,7 @@ module PhoReconcile
       #TODO make this configurable so we can search several different fields?      
       search = "#{search_field()}:#{query}"
       opts = {
-       "limit" => limit.to_s
+       "max" => limit.to_s
       }
       
       if types.length > 0
@@ -160,7 +160,7 @@ module PhoReconcile
            end
          end
       end
-            
+       
       resp = @store.search(search, opts)
             
       return parse_response(resp, properties)
