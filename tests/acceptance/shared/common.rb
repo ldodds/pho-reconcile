@@ -7,6 +7,14 @@ shared_examples_for "All Successful Responses" do
     
 end
 
+shared_examples_for "All JSONP Requests" do
+  
+    it "should have correct mimetype" do
+     @response.headers[:content_type].should == "application/javascript"       
+    end
+    
+end
+
 shared_examples_for "All JSON Requests" do
   
     it "should have correct mimetype" do
