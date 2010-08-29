@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'cgi'
 require 'spec'
 require 'rest_client'
 require 'siren'
