@@ -42,7 +42,7 @@ describe "The Reconciliation API," do
     it_should_behave_like "All JSON Requests"
     it_should_behave_like "All Single Query Mode Requests"
  
-    it "should have only the requested number of request" do
+    it "should have only the requested number of results" do
       query(@response, "$.result").length.should == 1
     end
     
