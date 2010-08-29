@@ -17,6 +17,7 @@ def server_get(path, opts = {})
   end
 end
 
+#parse HTTP response and run a Siren query over it
 def query(response, query)
   json = JSON.parse(response.body)
   return Siren.query(query, json)
