@@ -39,5 +39,22 @@ shared_examples_for "All Single Query Mode Requests" do
       result["match"].should_not be_nil  
     end
   end
-    
+      
+end
+
+shared_examples_for "All Multi Query Mode Requests" do
+  
+  it "should have results that have all required elements" do
+    parsed = JSON.parse(@response.body)
+    parsed.keys.each do |key|      
+      parsed[key]["result"].each do |result|
+        result["id"].should_not be_nil
+        result["name"].should_not be_nil
+        result["type"].should_not be_nil
+        result["score"].should_not be_nil
+        result["match"].should_not be_nil  
+      end      
+    end
+  end
+      
 end

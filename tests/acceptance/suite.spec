@@ -4,3 +4,4 @@ require "shared/common.rb"
 
 require "metadata.rb"
 require "single-query-mode.rb"
+require "multi-query-mode.rb"
