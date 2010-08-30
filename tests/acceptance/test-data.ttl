@@ -1,8 +1,13 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc: <http://purl.org/dc/terms/> .
 
 @prefix ex: <http://www.example.org/def/> .
+
+#Everything has a label here, as this is what's searched by default
+#Additional labelling properties are here to test overrides
 
 <http://www.example.org/person/1>
   a foaf:Person;
@@ -10,7 +15,8 @@
   
 <http://www.example.org/person/2>
   a foaf:Person;
-  rdfs:label "Bernard Crumble".  
+  rdfs:label "Bernard Crumble";
+  foaf:name "Bernard B. Crumble".  
   
 <http://www.example.org/person/2>
   a foaf:Person;
@@ -26,8 +32,10 @@
   
 <http://www.example.org/thing/b>
   a ex:Object;
-  rdfs:label "Petunias".        
+  rdfs:label "Petunias";
+  dc:title "A Pot of Petunias".        
   
 <http://www.example.org/thing/c>
   a ex:Object;
-  rdfs:label "Green Putty".          
+  rdfs:label "Green Putty";
+  skos:prefLabel "Some Green Putty".          

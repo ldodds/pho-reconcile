@@ -25,7 +25,7 @@ describe "The Reconciliation API," do
     it_should_behave_like "All Successful Responses"
     it_should_behave_like "All JSON Requests"
     it_should_behave_like "All Single Query Mode Requests"
-    
+          
   end
   
   context "when performing a limit query" do
@@ -93,4 +93,36 @@ describe "The Reconciliation API," do
         
   end
 
+  context "when returning query results" do
+  
+    before :all do
+      @test_store = "ldodds-pho-reconcile"      
+    end
+  
+    it "should return a useful label" do
+      query = { "query" => "Bloggs" }
+      response = server_get "/#{@test_store}/reconcile?query=#{CGI::escape(query.to_json)}"
+      query(response, "$.result").first["name"].should == "Joe Bloggs"
+    end
+    
+    it "should prefer foaf:name over rdfs:label" do
+      query = { "query" => "Crumble" }
+      response = server_get "/#{@test_store}/reconcile?query=#{CGI::escape(query.to_json)}"
+      query(response, "$.result").first["name"].should == "Bernard B. Crumble"      
+    end
+
+    it "should prefer skos:prefLabel over rdfs:label" do
+      query = { "query" => "Putty" }
+      response = server_get "/#{@test_store}/reconcile?query=#{CGI::escape(query.to_json)}"
+      query(response, "$.result").first["name"].should == "Some Green Putty"      
+    end
+    
+    it "should prefer dc:title over rdfs:label" do
+      query = { "query" => "Petunias" }
+      response = server_get "/#{@test_store}/reconcile?query=#{CGI::escape(query.to_json)}"
+      query(response, "$.result").first["name"].should == "A Pot of Petunias"            
+    end
+        
+  end
+  
 end

@@ -189,7 +189,8 @@ module PhoReconcile
       #      
       REXML::XPath.each(doc.root, "//rss:item", PhoReconcile::NAMESPACES) do |el|
         id = el.attributes["rdf:about"]
-          
+
+        #default label          
         label = REXML::XPath.first(el, "rss:title", PhoReconcile::NAMESPACES ).text
         score = REXML::XPath.first(el, "relevance:score", PhoReconcile::NAMESPACES ).text
         match = match?(score)
@@ -206,10 +207,6 @@ module PhoReconcile
               if full_name == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
                    desc = REXML::XPath.first(child, "rdf:Description", PhoReconcile::NAMESPACES)
                    types << desc.attributes["rdf:about"]
-              #this allows override of how name is generated. Default is from rss:title
-              elsif @opts[:label_property] != nil && full_name == @opts[:label_property]
-                  label = child.text
-                  properties[full_name] = child.text
               else
                   #resource?
                   desc = REXML::XPath.first(child, "rdf:Description", PhoReconcile::NAMESPACES)
@@ -223,6 +220,15 @@ module PhoReconcile
           end
         end
 
+        if @opts["label_property"] != nil && properties[ @opts[:label_property] ] != nil
+          label = properties[ @opts[:label_property] ]
+        else
+          label = properties["http://www.w3.org/2004/02/skos/core#prefLabel"] || label          
+          label = properties["http://www.w3.org/2000/01/rdf-schema#label"] || label
+          label = properties["http://xmlns.com/foaf/0.1/name"] || label
+          label = properties["http://purl.org/dc/terms/title"] || label
+        end
+                
         result = Result.new( id, label, score, match, types, properties )
         
         if result.matches?(filters)
