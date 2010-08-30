@@ -203,7 +203,12 @@ module PhoReconcile
         el.elements.each do |child|
           if child.prefix != NAMESPACES["rss"]
             if child.prefix != nil && child.prefix != ""
-              full_name = "#{child.namespaces[child.prefix]}#{child.name}"
+              #Work around REXML issues with older version of Ruby
+              if RUBY_VERSION < "1.8.7"
+                full_name = "#{child.namespace(child.prefix)}#{child.name}"
+              else
+                full_name = "#{child.namespaces[child.prefix]}#{child.name}"
+              end
               if full_name == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
                    desc = REXML::XPath.first(child, "rdf:Description", PhoReconcile::NAMESPACES)
                    types << desc.attributes["rdf:about"]
@@ -223,8 +228,8 @@ module PhoReconcile
         if @opts["label_property"] != nil && properties[ @opts[:label_property] ] != nil
           label = properties[ @opts[:label_property] ]
         else
+          label = properties["http://www.w3.org/2000/01/rdf-schema#label"] || label          
           label = properties["http://www.w3.org/2004/02/skos/core#prefLabel"] || label          
-          label = properties["http://www.w3.org/2000/01/rdf-schema#label"] || label
           label = properties["http://xmlns.com/foaf/0.1/name"] || label
           label = properties["http://purl.org/dc/terms/title"] || label
         end
