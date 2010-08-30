@@ -1,0 +1,13 @@
+0.0.2
+ * Added this file to capture ongoing changes
+ * Made properly compatible with Ruby 1.8.5
+ * Added some better defaulting of name property in absence of override configuration
+   Order is dc:title > foaf:name > skos:prefLabel -> rdfs:label -> rss:title
+ * Fixed bug with not passing limit onto Platform Store to reduce results
+ * Added acceptance test suite to properly exercise against specified behaviour
+ * Fixed structure for multi item responses
+ * Now handles POST requests for multi item queries 
+ * Fixed bug with not handling JSONP request for service metadata
+ 
+0.0.1
+ * Initial implementation compatible with specified behaviour

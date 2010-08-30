@@ -8,7 +8,7 @@ require 'pho'
 
 NAME = "pho-reconcile"
 VER = "0.0.2"
-PKG_FILES = %w( README.rdoc Rakefile ) + 
+PKG_FILES = %w( README.rdoc CHANGES Rakefile ) + 
   Dir.glob("{bin,lib,public,views}/**/*")
 
 RECONCILE_TEST_STORE="http://api.talis.com/stores/ldodds-pho-reconcile"
@@ -21,7 +21,7 @@ SPEC =
     s.platform = Gem::Platform::RUBY
     s.required_ruby_version = ">= 1.8.5"    
     s.has_rdoc = true
-    s.extra_rdoc_files = ["README.rdoc"]
+    s.extra_rdoc_files = ["README.rdoc", "CHANGES"]
     s.summary = "Reconciliation API for Talis Platform Stores"
     s.description = "Implementation of the Gridworks Reconciliation API"
     s.author = "Leigh Dodds"
