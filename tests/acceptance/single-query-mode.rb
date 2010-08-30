@@ -69,4 +69,28 @@ describe "The Reconciliation API," do
     end
         
   end
+  
+  context "when performing an any type query" do
+    
+    before :all do
+      test_store = "ldodds-pho-reconcile"
+      query = Hash.new
+      query["query"] = "Joe"  
+      query["type"] = [ "http://xmlns.com/foaf/0.1/Person", "http://www.example.org/def/Object" ]
+      query["type_strict"] = "any"     
+      @response = server_get "/#{test_store}/reconcile?query=#{CGI::escape(query.to_json)}"
+    end
+    
+    it_should_behave_like "All Successful Responses"
+    it_should_behave_like "All JSON Requests"
+    it_should_behave_like "All Single Query Mode Requests"
+  
+    it "should have results of only the requested types" do
+      query(@response, "$.result").each do |result|
+        ["http://xmlns.com/foaf/0.1/Person", "http://www.example.org/def/Object"].should include(result["type"][0])
+      end
+    end
+        
+  end
+
 end
