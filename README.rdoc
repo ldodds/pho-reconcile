@@ -34,8 +34,12 @@ is made using a field called "label". This can be altered by changing the "searc
 property in the JSON configuration.
 
 The results from the search include all properties of the resource. One of those properties 
-must be identified as the label for the resource. By default the rdfs:label property is used. 
-However this too can be altered in the JSON configuration.
+will be used as the "name" property for returning to Gridworks. When a match has been succesful 
+Gridworks changes the view of the field to be the returned value, so its important to get the 
+value of this property correct. By default the code attempts to pick a suitable labelling 
+property, preferring properties like dc:title, foaf:name, and skos:prefLabel over rdfs:label. 
+
+However the name property can also be set explicitly in the JSON configuration.
 
 The govuk-statistics store configuration changes both of these properties:
 
