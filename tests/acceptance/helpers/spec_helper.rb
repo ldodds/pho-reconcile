@@ -17,6 +17,14 @@ def server_get(path, opts = {})
   end
 end
 
+def server_post(path, opts = {})
+  #using the block form here so that we don't throw exceptions for 
+  #HTTP error codes. Makes the testing clearer
+  RestClient.post "#{server()}#{path}", opts do |response, request, result|
+    return response
+  end  
+end
+
 #parse HTTP response and run a Siren query over it
 def query(response, query)
   json = JSON.parse(response.body)
