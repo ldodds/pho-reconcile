@@ -15,7 +15,11 @@
 <http://www.example.org/person/2>
   a foaf:Person;
   rdfs:label "Joe Smith".
-  
+
+<http://www.example.org/thing/c>
+  a ex:Object;
+  rdfs:label "Cup o' Joe".
+    
 <http://www.example.org/thing/a>
   a ex:Object;
   rdfs:label "Whale".      
