@@ -137,8 +137,13 @@ module PhoReconcile
     #
     #  type_strict:: :any, :all, ...
     def reconcile(query, limit=10, types=[], type_strict=:any, properties=[])
-      #TODO make this configurable so we can search several different fields?      
-      search = "#{search_field()}:#{query}"
+      #TODO make this configurable so we can search several different fields?
+      if search_field() != "*"      
+        search = "#{search_field()}:#{query}"
+      else        
+        search = query
+      end
+      
       opts = {
        "max" => limit.to_s
       }
@@ -162,7 +167,7 @@ module PhoReconcile
       end
        
       resp = @store.search(search, opts)
-            
+
       return parse_response(resp, properties)
     end
     
