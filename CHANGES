@@ -1,3 +1,9 @@
+0.0.3
+ * Added support for marking search_field as "*" to prompt and unfielded search 
+   against the store index. This may become the default option in future, pending 
+   further testing. The govuk-statistics-wild configuration uses this feature, allowing 
+   comparison across the two different configurations.
+   
 0.0.2
  * Added this file to capture ongoing changes
  * Made properly compatible with Ruby 1.8.5

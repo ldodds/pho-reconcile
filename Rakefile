@@ -7,7 +7,7 @@ require 'rake/clean'
 require 'pho'
 
 NAME = "pho-reconcile"
-VER = "0.0.2"
+VER = "0.0.3"
 PKG_FILES = %w( README.rdoc CHANGES Rakefile ) + 
   Dir.glob("{bin,lib,public,views}/**/*")
 
