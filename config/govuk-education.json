@@ -1,3 +1,4 @@
 {
- "label_property": "http://www.w3.org/2000/01/rdf-schema#label"
+ "label_property": "http://www.w3.org/2000/01/rdf-schema#label",
+ "match_score": "0.9999"
 }
