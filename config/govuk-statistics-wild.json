@@ -1,5 +1,6 @@
 {
  "store": "govuk-statistics",
  "search_field": "*",
- "label_property": "http://www.w3.org/2004/02/skos/core#prefLabel"
+ "label_property": "http://www.w3.org/2004/02/skos/core#prefLabel",
+ "match_score": "0.9999"
 }
