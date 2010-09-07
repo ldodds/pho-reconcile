@@ -87,8 +87,13 @@ module PhoReconcile
       @opts = opts
     end
     
-    #Perform a reconcilation request as described in the provided json object
-    def reconcile_request(obj)
+    #Decompose the request into individual variables
+    #
+    #Used to provide some separation between format of Gridworks query and 
+    #the methods that do the work. 
+    #
+    #returns: query, limit, types, type_strict, properties
+    def decompose(obj)
       query = obj["query"]
       limit = 10
       types = Array.new
@@ -120,9 +125,14 @@ module PhoReconcile
       if obj["properties"] != nil
         properties = properties
       end
-      
+
+      return query, limit, types, type_strict, properties       
+    end
+        
+    #Perform a reconcilation request as described in the provided json object
+    def reconcile_request(obj)      
+      query, limit, types, type_strict, properties = decompose(obj)
       return reconcile(query, limit, types, type_strict, properties)
-      
     end
     
     def search_field()
@@ -137,6 +147,13 @@ module PhoReconcile
     #
     #  type_strict:: :any, :all, ...
     def reconcile(query, limit=10, types=[], type_strict=:any, properties=[])
+      search, opts = make_search(query, limit, types, type_strict, properties)
+      resp = @store.search(search, opts)
+
+      return parse_response(resp.status, resp.content, properties)
+    end
+    
+    def make_search(query, limit, types=[], type_strict=:ant, properties=[])
       #TODO make this configurable so we can search several different fields?
       if search_field() != "*"      
         search = "#{search_field()}:#{query}"
@@ -165,18 +182,16 @@ module PhoReconcile
            end
          end
       end
-       
-      resp = @store.search(search, opts)
-
-      return parse_response(resp, properties)
+      return search, opts
+            
     end
-    
+      
     #parse a platform search response into an array of Response objects
-    def parse_response(resp, filters=[])
-      if resp.status != 200
-        raise "Unable to read search response: #{resp.status} #{resp.content}"
+    def parse_response(status, content, filters=[])
+      if status != 200
+        raise "Unable to read search response: #{status} #{content}"
       end
-      doc = REXML::Document.new(resp.content)
+      doc = REXML::Document.new(content)
       results = Array.new
       
       #TODO

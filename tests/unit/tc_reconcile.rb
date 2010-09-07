@@ -83,7 +83,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_basic_query()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "limit" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "max" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)    
     reconciler = PhoReconcile::Reconciler.new(store)    
@@ -93,7 +93,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_basic_query_overriding_field()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "prefLabel:Bath", "limit" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "prefLabel:Bath", "max" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)    
     reconciler = PhoReconcile::Reconciler.new(store, {:search_field => "prefLabel"})    
@@ -103,7 +103,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_limit()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "limit" => "20"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "max" => "20"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -117,7 +117,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "max" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -133,7 +133,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_any_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "max" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -149,7 +149,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_all_type()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" AND type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" AND type:\"http://www.example.org/ns/Place\")", "max" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -165,7 +165,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_query_with_type_and_properties()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\"", "max" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)
@@ -201,7 +201,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_parse_basic_query_from_json()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "limit" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath", "max" => "10"}).returns( HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)    
     reconciler = PhoReconcile::Reconciler.new(store)    
@@ -211,7 +211,7 @@ class ReconcileTest < Test::Unit::TestCase
   def test_parse_typed_query_from_json()
     mc = mock()
     mc.expects(:set_auth)
-    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "limit" => "10"}).returns(
+    mc.expects(:get).with("http://api.talis.com/stores/testing/items", {"query" => "label:Bath (type:\"http://statistics.data.gov.uk/def/nuts-geography/NUTSLevel2\" OR type:\"http://www.example.org/ns/Place\")", "max" => "10"}).returns(
     HTTP::Message.new_response(RESPONSE) )
     
     store = Pho::Store.new("http://api.talis.com/stores/testing", "user", "pass", mc)    

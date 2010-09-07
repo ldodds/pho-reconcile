@@ -1,3 +1,7 @@
+0.0.4
+ * Now makes parallel HTTP requests to the Platform when doing POST requests, which is 
+   what Gridworks uses. Code is now dependent on typhoeus
+   
 0.0.3
  * Added support for marking search_field as "*" to prompt and unfielded search 
    against the store index. This may become the default option in future, pending 

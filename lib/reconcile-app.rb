@@ -1,7 +1,9 @@
 require 'rubygems'
+
 require 'pho'
 require 'pho-reconcile/reconcile.rb'
 require 'sinatra/base'
+require 'typhoeus'
 require 'json'
 
 class ReconcileApp < Sinatra::Base
@@ -41,17 +43,45 @@ class ReconcileApp < Sinatra::Base
     else
       @store = Pho::Store.new("http://api.talis.com/stores/#{params[:store]}")
     end
-
-    #multiple queries
-    reconciler = PhoReconcile::Reconciler.new( @store, @opts )   
+    
+    hydra = Typhoeus::Hydra.new    
+    reconciler = PhoReconcile::Reconciler.new( @store, @opts )     
     begin
-      queries = JSON.parse( params[:queries] )          
-      response = {}
+      response = {}       
+      queries = JSON.parse( params[:queries] )
+        
+      reqs = {}
+      puts queries.keys.length
+      #Build a Typhoeus request for each query
       queries.keys.each do |key|
-      response[key] = { "result" => reconciler.reconcile_request( queries[key] ) } 
+        url = @store.build_uri("/items")
+        query, limit, types, type_strict, properties = reconciler.decompose( queries[key] )
+        search, opts = reconciler.make_search(query, limit, types, type_strict, properties)
+        opts["query"] = search
+        
+        req = Typhoeus::Request.new(url, :params => opts)
+        #on complete parse the response
+        req.on_complete do |r|
+           reconciler.parse_response(r.code, r.body, properties)      
+        end        
+        hydra.queue(req)
+        reqs[key] = req
       end
+      
+      #Run all requests in parallel
+      hydra.run
+      
+      #Now serialize the responses
+      reqs.keys.each do |key|
+        req = reqs[key]
+        result = req.handled_response
+        response[key] = { "result" => req.handled_response }
+      end
+      
       response = response.to_json
-     rescue
+     rescue => e
+       puts e.inspect
+       puts e.backtrace
        status 500
        return "Unable to perform reconciliation requests"
      end
@@ -108,6 +138,7 @@ class ReconcileApp < Sinatra::Base
     
     else
       #multiple queries
+      #FIXME refactor to make parallel
       reconciler = PhoReconcile::Reconciler.new( @store, @opts )   
       begin
         queries = JSON.parse( params[:queries] )          
