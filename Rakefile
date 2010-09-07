@@ -7,7 +7,7 @@ require 'rake/clean'
 require 'pho'
 
 NAME = "pho-reconcile"
-VER = "0.0.3"
+VER = "0.0.4"
 PKG_FILES = %w( README.rdoc CHANGES Rakefile ) + 
   Dir.glob("{bin,lib,public,views}/**/*")
 
@@ -41,6 +41,7 @@ SPEC =
     s.add_dependency("rest-client")
     s.add_dependency("rspec")
     s.add_dependency("json")
+    s.add_dependency("typhoeus")
 
   end
       
