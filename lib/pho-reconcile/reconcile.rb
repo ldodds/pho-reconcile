@@ -123,7 +123,7 @@ module PhoReconcile
       
       properties = Array.new
       if obj["properties"] != nil
-        properties = properties
+        properties = obj["properties"]
       end
 
       return query, limit, types, type_strict, properties       

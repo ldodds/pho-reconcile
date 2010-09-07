@@ -51,7 +51,6 @@ class ReconcileApp < Sinatra::Base
       queries = JSON.parse( params[:queries] )
         
       reqs = {}
-      puts queries.keys.length
       #Build a Typhoeus request for each query
       queries.keys.each do |key|
         url = @store.build_uri("/items")
