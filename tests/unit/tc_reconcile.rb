@@ -190,7 +190,7 @@ class ReconcileTest < Test::Unit::TestCase
     mc.stub_everything()
     reconciler = PhoReconcile::Reconciler.new( mc )
     
-    results = reconciler.parse_response(resp)
+    results = reconciler.parse_response(resp.status, resp.content)
     assert_not_nil(results)
     assert_equal(3, results.length)
     assert_equal("http://statistics.data.gov.uk/id/nuts-lau/UKK1201", results[0].id)
