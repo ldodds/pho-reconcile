@@ -12,5 +12,13 @@
 	<% end %>
 	"view" : {
 	    "url" : "{{id}}"
-	 }    
+	 },
+	"_config" : {
+	  "search_field" : "<%= @opts[:search_field] %>",
+	  <% if @opts[:match_score] != nil %>
+	  "match_score" : "<%= @opts[:match_score] %>",
+	  <% end %>
+	  "store_uri" : "<%= @store.storeuri() %>",
+	  "search_service" : "<%= @store.storeuri() %>/items",
+	}    
 }
