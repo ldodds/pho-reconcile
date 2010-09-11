@@ -1,3 +1,9 @@
+0.0.5
+ * Now expose service specific metadata, see
+   http://github.com/ldodds/pho-reconcile/issues/closed#issue/1
+   
+ * Fixed bug in property filtering: wasn't grabbing fields from the request
+ 
 0.0.4
  * Now makes parallel HTTP requests to the Platform when doing POST requests, which is 
    what Gridworks uses. Code is now dependent on typhoeus
